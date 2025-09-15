@@ -1,0 +1,114 @@
+// packages/database/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password_hash String
+  full_name     String
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  role_id       Int
+  role          Role           @relation(fields: [role_id], references: [id])
+  shoppingLists ShoppingList[]
+  products      Product[]
+  stores        Store[]
+  promotions    Promotion[]
+
+  @@map("users")
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  display_order Int?
+  products      Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  category_id Int?
+  category    Category?  @relation(fields: [category_id], references: [id])
+  user_id     String?
+  user        User?      @relation(fields: [user_id], references: [id])
+  listItems   ListItem[]
+  promotions  Promotion[]
+
+  @@map("products")
+}
+
+model Store {
+  id         Int         @id @default(autoincrement())
+  name       String
+  address    String?
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  user_id    String?
+  user       User?       @relation(fields: [user_id], references: [id])
+  promotions Promotion[]
+
+  @@map("stores")
+}
+
+model ShoppingList {
+  id          Int        @id @default(autoincrement())
+  name        String
+  budget      Float?
+  is_archived Boolean    @default(false)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  user_id     String
+  user        User       @relation(fields: [user_id], references: [id])
+  items       ListItem[]
+
+  @@map("shopping_lists")
+}
+
+model ListItem {
+  id             Int          @id @default(autoincrement())
+  quantity       Int          @default(1)
+  price_per_unit Float?
+  is_checked     Boolean      @default(false)
+  list_id        Int
+  list           ShoppingList @relation(fields: [list_id], references: [id], onDelete: Cascade)
+  product_id     Int
+  product        Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("list_items")
+}
+
+model Promotion {
+  id          Int       @id @default(autoincrement())
+  description String
+  start_date  DateTime?
+  end_date    DateTime?
+  product_id  Int
+  product     Product   @relation(fields: [product_id], references: [id])
+  store_id    Int
+  store       Store     @relation(fields: [store_id], references: [id])
+  user_id     String?
+  user        User?     @relation(fields: [user_id], references: [id])
+
+  @@map("promotions")
+}
