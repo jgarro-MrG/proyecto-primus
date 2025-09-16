@@ -9,10 +9,12 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox'; // <-- NUEVA IMPORTACIÓN
+import { cn } from '@/lib/utils'; // Importamos la utilidad de clases
 
-// Tipos para nuestros datos
+// Tipos para nuestros datos (añadimos is_checked)
 type Product = { id: number; name: string; };
-type ListItem = { id: number; quantity: number; price_per_unit: number | null; product: Product; };
+type ListItem = { id: number; quantity: number; price_per_unit: number | null; product: Product; is_checked: boolean; };
 type ShoppingList = { id: number; name: string; budget: number | null; is_archived: boolean; items: ListItem[]; };
 
 export default function ListDetailPage() {
@@ -25,8 +27,6 @@ export default function ListDetailPage() {
   const [list, setList] = useState<ShoppingList | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Estado para el formulario de nuevo artículo
   const [newItemName, setNewItemName] = useState('');
 
   const fetchListDetails = useCallback(async () => {
@@ -82,6 +82,41 @@ export default function ListDetailPage() {
     }
   };
 
+  // NUEVA FUNCIÓN: Para manejar el cambio de estado del checkbox
+  const handleToggleItemChecked = async (itemId: number, currentCheckedState: boolean) => {
+    if (!token) return;
+
+    // Actualización optimista: Cambiamos el estado local inmediatamente para una mejor UX
+    setList(currentList => {
+      if (!currentList) return null;
+      return {
+        ...currentList,
+        items: currentList.items.map(item =>
+          item.id === itemId ? { ...item, is_checked: !currentCheckedState } : item
+        ),
+      };
+    });
+
+    try {
+      const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items/${itemId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isChecked: !currentCheckedState }),
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo actualizar el artículo.');
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+      // Si la API falla, revertimos el cambio en la UI
+      fetchListDetails();
+    }
+  };
+
   if (isAuthLoading || isFetching) {
     return <div className="flex h-screen items-center justify-center">Cargando...</div>;
   }
@@ -121,7 +156,22 @@ export default function ListDetailPage() {
                 {list.items.length > 0 ? (
                   list.items.map(item => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm">
-                      <span className="font-medium">{item.product.name}</span>
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`item-${item.id}`}
+                          checked={item.is_checked}
+                          onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)}
+                        />
+                        <label
+                          htmlFor={`item-${item.id}`}
+                          className={cn(
+                            "font-medium cursor-pointer",
+                            item.is_checked && "line-through text-gray-500"
+                          )}
+                        >
+                          {item.product.name}
+                        </label>
+                      </div>
                       <span className="text-sm text-gray-500">Cantidad: {item.quantity}</span>
                     </div>
                   ))

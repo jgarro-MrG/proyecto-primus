@@ -5,6 +5,7 @@ import { CreateShoppingListDto } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateListItemDto } from './dto/create-list-item.dto';
+import { UpdateListItemDto } from './dto/update-list-item.dto';
 
 @UseGuards(AuthGuard('jwt')) // <-- Protege todas las rutas de este controlador
 @Controller('shopping-lists')
@@ -52,5 +53,15 @@ export class ShoppingListsController {
     @Body() createListItemDto: CreateListItemDto,
   ) {
     return this.shoppingListsService.addItemToList(listId, req.user.id, createListItemDto);
+  }
+
+  @Patch(':listId/items/:itemId')
+  updateItem(
+    @Param('listId', ParseIntPipe) listId: number,
+    @Param('itemId', ParseIntPipe) itemId: number,
+    @Request() req,
+    @Body() updateListItemDto: UpdateListItemDto,
+  ) {
+    return this.shoppingListsService.updateListItem(listId, itemId, req.user.id, updateListItemDto);
   }
 }

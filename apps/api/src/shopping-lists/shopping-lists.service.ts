@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateShoppingListDto } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { CreateListItemDto } from './dto/create-list-item.dto';
+import { UpdateListItemDto } from './dto/update-list-item.dto';
 
 @Injectable()
 export class ShoppingListsService {
@@ -116,4 +117,32 @@ export class ShoppingListsService {
     return listItem;
   }
 
+  async updateListItem(listId: number, itemId: number, userId: string, updateListItemDto: UpdateListItemDto) {
+  // Primero, verificamos que el usuario sea el dueño de la lista a la que pertenece el artículo
+  const list = await this.prisma.shoppingList.findUnique({
+    where: { id: listId },
+    include: { items: true },
+  });
+
+  if (!list || list.user_id !== userId) {
+    throw new ForbiddenException('You do not have permission to access this list');
+  }
+
+  // Verificamos que el artículo realmente pertenezca a esta lista
+  const itemExists = list.items.some(item => item.id === itemId);
+  if (!itemExists) {
+    throw new NotFoundException(`List item with ID ${itemId} not found in this list`);
+  }
+
+  // Si todo es correcto, actualizamos el artículo
+  return this.prisma.listItem.update({
+    where: { id: itemId },
+    data: {
+      is_checked: updateListItemDto.isChecked,
+      },
+      include: {
+        product: true,
+      },
+    });
+  }
 }
