@@ -1,5 +1,6 @@
 // apps/web/src/app/dashboard/page.tsx
 'use client';
+import Link from 'next/link';
 
 // 1. Importamos los hooks que necesitamos, incluyendo useCallback
 import { useEffect, useState, useCallback } from 'react';
@@ -76,20 +77,24 @@ export default function DashboardPage() {
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {token && <CreateListDialog token={token} onListCreated={fetchLists} />}
+
+          {/* Mapeo de las listas existentes */}
           {lists.map((list) => (
-            <Card key={list.id} className="h-48 flex flex-col justify-between">
-              <CardHeader>
-                <CardTitle>{list.name}</CardTitle>
-                {list.budget && (
-                  <CardDescription>Presupuesto: ${list.budget}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500">
-                  {list.is_archived ? 'Archivada' : 'Activa'}
-                </p>
-              </CardContent>
-            </Card>
+            <Link href={`/dashboard/lists/${list.id}`} key={list.id}>
+              <Card className="h-48 flex flex-col justify-between hover:border-blue-500 transition-colors">
+                <CardHeader>
+                  <CardTitle>{list.name}</CardTitle>
+                  {list.budget && (
+                    <CardDescription>Presupuesto: ${list.budget}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500">
+                    {list.is_archived ? 'Archivada' : 'Activa'}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
