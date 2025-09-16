@@ -3,6 +3,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateShoppingListDto } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
+import { CreateListItemDto } from './dto/create-list-item.dto';
 
 @Injectable()
 export class ShoppingListsService {
@@ -23,19 +24,27 @@ export class ShoppingListsService {
     });
   }
 
-  async findOne(id: number, userId: string) { // <-- ID es ahora un número
+  async findOne(id: number, userId: string) {
     const list = await this.prisma.shoppingList.findUnique({
       where: { id },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+          orderBy: {
+            id: 'asc'
+          }
+        },
+      },
     });
 
     if (!list) {
-      throw new NotFoundException('Shopping list not found');
+      throw new NotFoundException(`Shopping list with ID ${id} not found`);
     }
-
     if (list.user_id !== userId) {
       throw new ForbiddenException('You do not have permission to access this list');
     }
-
     return list;
   }
 
@@ -57,6 +66,54 @@ export class ShoppingListsService {
     return this.prisma.shoppingList.delete({
       where: { id },
     });
+  }
+
+  // NUEVO MÉTODO: Para añadir un artículo a una lista
+  async addItemToList(listId: number, userId: string, createListItemDto: CreateListItemDto) {
+    const { productName, quantity, price_per_unit } = createListItemDto;
+
+    // Primero, verificamos que el usuario sea el dueño de la lista
+    const list = await this.prisma.shoppingList.findUnique({ where: { id: listId } });
+    if (!list || list.user_id !== userId) {
+      throw new ForbiddenException('You do not have permission to modify this list');
+    }
+
+    // Buscamos si el producto ya existe (por nombre, distinción de mayúsculas/minúsculas)
+    // En una app real, esto sería más complejo (productos globales vs. de usuario)
+    let product = await this.prisma.product.findFirst({
+      where: {
+        name: {
+          equals: productName,
+          mode: 'insensitive',
+        },
+        // Opcional: filtrar por productos globales (user_id: null) o de este usuario
+      },
+    });
+
+    // Si el producto no existe, lo creamos
+    if (!product) {
+      product = await this.prisma.product.create({
+        data: {
+          name: productName,
+          user_id: userId, // Lo creamos como un producto personalizado del usuario
+        },
+      });
+    }
+
+    // Finalmente, creamos el ListItem y lo conectamos a la lista y al producto
+    const listItem = await this.prisma.listItem.create({
+      data: {
+        quantity,
+        price_per_unit,
+        list_id: listId,
+        product_id: product.id,
+      },
+      include: {
+        product: true
+      }
+    });
+
+    return listItem;
   }
 
 }
