@@ -11,9 +11,11 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil, ArrowLeft } from 'lucide-react';
+import { EditListDialog } from '@/components/dashboard/EditListDialog';
+import { EditListItemDialog } from '@/components/dashboard/EditListItemDialog';
 
-// Tipos para nuestros datos (añadimos is_checked)
+// Tipos para nuestros datos
 type Product = { id: number; name: string; };
 type ListItem = { id: number; quantity: number; price_per_unit: number | null; product: Product; is_checked: boolean; };
 type ShoppingList = { id: number; name: string; budget: number | null; is_archived: boolean; items: ListItem[]; };
@@ -24,10 +26,16 @@ export default function ListDetailPage() {
   const params = useParams();
   const { listId } = params;
   const { toast } = useToast();
+
   const [list, setList] = useState<ShoppingList | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newItemName, setNewItemName] = useState('');
+
+  // Estados para controlar los diálogos de edición
+  const [isEditListOpen, setIsEditListOpen] = useState(false);
+  const [isEditItemOpen, setIsEditItemOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ListItem | null>(null);
 
   const fetchListDetails = useCallback(async () => {
     if (!token || !listId) return;
@@ -37,7 +45,12 @@ export default function ListDetailPage() {
       const response = await fetch(`http://localhost:3000/shopping-lists/${listId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('No se pudieron obtener los detalles de la lista.');
+      if (!response.ok) {
+        if (response.status === 403 || response.status === 404) {
+          router.push('/dashboard');
+        }
+        throw new Error('No se pudo obtener la lista.');
+      }
       const data = await response.json();
       setList(data);
     } catch (err: any) {
@@ -45,7 +58,7 @@ export default function ListDetailPage() {
     } finally {
       setIsFetching(false);
     }
-  }, [token, listId]);
+  }, [token, listId, router]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -58,25 +71,18 @@ export default function ListDetailPage() {
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemName.trim() || !token) return;
+    if (!token || !newItemName.trim()) return;
 
     try {
       const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productName: newItemName }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ productName: newItemName, quantity: 1 }),
       });
+      if (!response.ok) throw new Error('No se pudo añadir el artículo.');
 
-      if (!response.ok) {
-        throw new Error('No se pudo añadir el artículo.');
-      }
-
-      setNewItemName(''); // Limpiar el input
-      fetchListDetails(); // Refrescar la lista de artículos
-      toast({ title: "¡Artículo añadido!", description: `"${newItemName}" ha sido añadido a tu lista.` });
+      setNewItemName('');
+      await fetchListDetails(); // Refresca la lista para mostrar el nuevo artículo
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
@@ -85,7 +91,6 @@ export default function ListDetailPage() {
   const handleToggleItemChecked = async (itemId: number, currentCheckedState: boolean) => {
     if (!token) return;
 
-    // Actualización optimista: Cambiamos el estado local inmediatamente para una mejor UX
     setList(currentList => {
       if (!currentList) return null;
       return {
@@ -99,57 +104,41 @@ export default function ListDetailPage() {
     try {
       const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items/${itemId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ isChecked: !currentCheckedState }),
       });
-
-      if (!response.ok) {
-        throw new Error('No se pudo actualizar el artículo.');
-      }
+      if (!response.ok) throw new Error('No se pudo actualizar el artículo.');
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-      // Si la API falla, revertimos el cambio en la UI
-      fetchListDetails();
+      fetchListDetails(); // Revertir si hay error
     }
   };
 
-  // NUEVA FUNCIÓN: Para manejar la eliminación de un artículo
   const handleDeleteItem = async (itemId: number) => {
     if (!token) return;
-
-    // Guardamos el estado actual por si necesitamos revertir
     const originalList = list;
 
-    // Actualización optimista: Eliminamos el artículo de la UI inmediatamente
     setList(currentList => {
       if (!currentList) return null;
-      return {
-        ...currentList,
-        items: currentList.items.filter(item => item.id !== itemId),
-      };
+      return { ...currentList, items: currentList.items.filter(item => item.id !== itemId) };
     });
 
     try {
       const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items/${itemId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
-
-      if (!response.ok) {
-        throw new Error('No se pudo eliminar el artículo.');
-      }
-
+      if (!response.ok) throw new Error('No se pudo eliminar el artículo.');
       toast({ title: "Artículo eliminado" });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-      // Si la API falla, revertimos el cambio en la UI
       setList(originalList);
     }
+  };
+
+  const handleEditItemClick = (item: ListItem) => {
+    setSelectedItem(item);
+    setIsEditItemOpen(true);
   };
 
   if (isAuthLoading || isFetching) {
@@ -160,74 +149,99 @@ export default function ListDetailPage() {
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="max-w-4xl mx-auto">
         <header className="mb-6">
-          <Button asChild variant="outline">
-            <Link href="/dashboard">← Volver a Mis Listas</Link>
+          <Button variant="ghost" asChild>
+            <Link href="/dashboard">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver al Dashboard
+            </Link>
           </Button>
         </header>
 
         {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
 
-        {list && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-4xl">{list.name}</CardTitle>
-              {list.budget && <CardDescription>Presupuesto: ${list.budget}</CardDescription>}
-            </CardHeader>
-            <CardContent>
-              {/* Formulario para añadir nuevo artículo */}
-              <form onSubmit={handleAddItem} className="flex gap-2 mb-6">
-                <Input
-                  type="text"
-                  placeholder="Ej: Leche, Huevos..."
-                  value={newItemName}
-                  onChange={(e) => setNewItemName(e.target.value)}
-                  className="flex-grow"
-                />
-                <Button type="submit">Añadir</Button>
-              </form>
+        {list && token && (
+          <>
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-4xl">{list.name}</CardTitle>
+                    {list.budget && <CardDescription>Presupuesto: ${list.budget}</CardDescription>}
+                  </div>
+                  <Button variant="outline" size="icon" onClick={() => setIsEditListOpen(true)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAddItem} className="flex gap-2 mb-4">
+                  <Input
+                    placeholder="Añadir nuevo artículo..."
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                  />
+                  <Button type="submit">Añadir</Button>
+                </form>
 
-              {/* Lista de artículos CORREGIDA */}
-              <div className="space-y-2">
-                {list.items.length > 0 ? (
-                  list.items.map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id={`item-${item.id}`}
-                          checked={item.is_checked}
-                          onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)}
-                        />
-                        <label
-                          htmlFor={`item-${item.id}`}
-                          className={cn(
-                            "font-medium cursor-pointer",
-                            item.is_checked && "line-through text-gray-500"
-                          )}
-                        >
-                          {item.product.name}
-                        </label>
+                <div className="space-y-2">
+                  {list.items.length > 0 ? (
+                    list.items.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            id={`item-${item.id}`}
+                            checked={item.is_checked}
+                            onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)}
+                          />
+                          <label
+                            htmlFor={`item-${item.id}`}
+                            className={cn("font-medium cursor-pointer", item.is_checked && "line-through text-gray-500")}
+                          >
+                            {item.product.name}
+                          </label>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>
+                            Cantidad: {item.quantity}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleDeleteItem(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-500">Cantidad: {item.quantity}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleDeleteItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500 py-4">Tu lista está vacía. ¡Añade tu primer artículo!</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 py-4">Tu lista está vacía. ¡Añade tu primer artículo!</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <EditListDialog
+              list={list}
+              token={token}
+              onListUpdated={fetchListDetails}
+              isOpen={isEditListOpen}
+              setIsOpen={setIsEditListOpen}
+            />
+            <EditListItemDialog
+              item={selectedItem}
+              listId={list.id}
+              token={token}
+              onItemUpdated={fetchListDetails}
+              isOpen={isEditItemOpen}
+              setIsOpen={setIsEditItemOpen}
+            />
+          </>
         )}
       </div>
     </div>
   );
 }
+
+
