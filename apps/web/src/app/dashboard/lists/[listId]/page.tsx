@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Checkbox } from '@/components/ui/checkbox'; // <-- NUEVA IMPORTACIÓN
-import { cn } from '@/lib/utils'; // Importamos la utilidad de clases
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { Trash2 } from 'lucide-react';
 
 // Tipos para nuestros datos (añadimos is_checked)
 type Product = { id: number; name: string; };
@@ -23,7 +24,6 @@ export default function ListDetailPage() {
   const params = useParams();
   const { listId } = params;
   const { toast } = useToast();
-
   const [list, setList] = useState<ShoppingList | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +82,6 @@ export default function ListDetailPage() {
     }
   };
 
-  // NUEVA FUNCIÓN: Para manejar el cambio de estado del checkbox
   const handleToggleItemChecked = async (itemId: number, currentCheckedState: boolean) => {
     if (!token) return;
 
@@ -114,6 +113,42 @@ export default function ListDetailPage() {
       toast({ title: "Error", description: err.message, variant: "destructive" });
       // Si la API falla, revertimos el cambio en la UI
       fetchListDetails();
+    }
+  };
+
+  // NUEVA FUNCIÓN: Para manejar la eliminación de un artículo
+  const handleDeleteItem = async (itemId: number) => {
+    if (!token) return;
+
+    // Guardamos el estado actual por si necesitamos revertir
+    const originalList = list;
+
+    // Actualización optimista: Eliminamos el artículo de la UI inmediatamente
+    setList(currentList => {
+      if (!currentList) return null;
+      return {
+        ...currentList,
+        items: currentList.items.filter(item => item.id !== itemId),
+      };
+    });
+
+    try {
+      const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo eliminar el artículo.');
+      }
+
+      toast({ title: "Artículo eliminado" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+      // Si la API falla, revertimos el cambio en la UI
+      setList(originalList);
     }
   };
 
@@ -151,11 +186,11 @@ export default function ListDetailPage() {
                 <Button type="submit">Añadir</Button>
               </form>
 
-              {/* Lista de artículos */}
+              {/* Lista de artículos CORREGIDA */}
               <div className="space-y-2">
                 {list.items.length > 0 ? (
                   list.items.map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm">
+                    <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
                       <div className="flex items-center gap-3">
                         <Checkbox
                           id={`item-${item.id}`}
@@ -172,7 +207,17 @@ export default function ListDetailPage() {
                           {item.product.name}
                         </label>
                       </div>
-                      <span className="text-sm text-gray-500">Cantidad: {item.quantity}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-500">Cantidad: {item.quantity}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleDeleteItem(item.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (

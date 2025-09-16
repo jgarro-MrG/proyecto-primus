@@ -145,4 +145,30 @@ export class ShoppingListsService {
       },
     });
   }
+
+  async deleteListItem(listId: number, itemId: number, userId: string) {
+    // Verificamos que el usuario sea el dueño de la lista a la que pertenece el artículo
+    const list = await this.prisma.shoppingList.findUnique({
+      where: { id: listId },
+      include: { items: true },
+    });
+
+    if (!list || list.user_id !== userId) {
+      throw new ForbiddenException('You do not have permission to access this list');
+    }
+
+    // Verificamos que el artículo realmente pertenezca a esta lista
+    const itemExists = list.items.some(item => item.id === itemId);
+    if (!itemExists) {
+      throw new NotFoundException(`List item with ID ${itemId} not found in this list`);
+    }
+
+    // Si todo es correcto, eliminamos el artículo
+    await this.prisma.listItem.delete({
+      where: { id: itemId },
+    });
+
+    // No devolvemos nada en una operación de borrado exitosa (HTTP 204 No Content)
+    return;
+  }
 }
