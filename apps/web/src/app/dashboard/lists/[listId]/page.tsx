@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { Trash2, Pencil, ArrowLeft } from 'lucide-react';
 import { EditListDialog } from '@/components/dashboard/EditListDialog';
 import { EditListItemDialog } from '@/components/dashboard/EditListItemDialog';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 // Tipos para nuestros datos
 type Product = { id: number; name: string; };
@@ -59,6 +60,15 @@ export default function ListDetailPage() {
       setIsFetching(false);
     }
   }, [token, listId, router]);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+    fetchListDetails();
+  }, [token, isAuthLoading, router, fetchListDetails]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -141,19 +151,21 @@ export default function ListDetailPage() {
     setIsEditItemOpen(true);
   };
 
-  if (isAuthLoading || isFetching) {
-    return <div className="flex h-screen items-center justify-center">Cargando...</div>;
+  if (isFetching || isAuthLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner className="h-12 w-12" />
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <header className="mb-6">
-          <Button variant="ghost" asChild>
-            <Link href="/dashboard">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al Dashboard
-            </Link>
+        <header className="mb-4">
+          <Button variant="ghost" onClick={() => router.push('/dashboard')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver al Dashboard
           </Button>
         </header>
 
@@ -183,9 +195,9 @@ export default function ListDetailPage() {
                   <Button type="submit">Añadir</Button>
                 </form>
 
-                <div className="space-y-2">
+                <div className="space-y-2 mt-6">
                   {list.items.length > 0 ? (
-                    list.items.map(item => (
+                    [...list.items].sort((a, b) => Number(a.is_checked) - Number(b.is_checked)).map(item => (
                       <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
                         <div className="flex items-center gap-3">
                           <Checkbox

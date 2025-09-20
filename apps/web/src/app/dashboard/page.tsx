@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { CreateListDialog } from '@/components/dashboard/CreateListDialog'; // <-- Importamos el nuevo componente
+import { CreateListDialog } from '@/components/dashboard/CreateListDialog';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 type ShoppingList = {
   id: number;
@@ -62,7 +63,11 @@ export default function DashboardPage() {
   }, [token, isLoading, router, fetchLists]);
 
   if (isLoading || isFetching) {
-    return <div className="flex h-screen items-center justify-center">Cargando...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner className="h-12 w-12" />
+      </div>
+    );
   }
 
   return (
@@ -81,7 +86,7 @@ export default function DashboardPage() {
           {/* Mapeo de las listas existentes */}
           {lists.map((list) => (
             <Link href={`/dashboard/lists/${list.id}`} key={list.id}>
-              <Card className="h-48 flex flex-col justify-between hover:border-blue-500 transition-colors">
+              <Card key={list.id} className="h-48 flex flex-col justify-between hover:shadow-lg hover:border-primary transition-all duration-200 cursor-pointer">
                 <CardHeader>
                   <CardTitle>{list.name}</CardTitle>
                   {list.budget && (
