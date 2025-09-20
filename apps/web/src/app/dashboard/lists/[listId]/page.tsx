@@ -15,6 +15,8 @@ import { Trash2, Pencil, ArrowLeft } from 'lucide-react';
 import { EditListDialog } from '@/components/dashboard/EditListDialog';
 import { EditListItemDialog } from '@/components/dashboard/EditListItemDialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { EmptyState } from '@/components/dashboard/EmptyState';
+import { ShoppingCart } from 'lucide-react';
 
 // Tipos para nuestros datos
 type Product = { id: number; name: string; };
@@ -228,7 +230,12 @@ export default function ListDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-gray-500 py-4">Tu lista está vacía. ¡Añade tu primer artículo!</p>
+                    <EmptyState
+                      icon={ShoppingCart}
+                      title="Tu lista está vacía"
+                      description="Usa el formulario de arriba para añadir tu primer artículo y empezar a comprar."
+                      className="mt-6"
+                    />
                   )}
                 </div>
               </CardContent>

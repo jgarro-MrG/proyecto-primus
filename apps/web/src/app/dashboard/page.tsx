@@ -7,9 +7,22 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import { CreateListDialog } from '@/components/dashboard/CreateListDialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { EmptyState } from '@/components/dashboard/EmptyState';
+import { ClipboardList, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 type ShoppingList = {
   id: number;
@@ -21,9 +34,11 @@ type ShoppingList = {
 export default function DashboardPage() {
   const { token, logout, isLoading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [listToDelete, setListToDelete] = useState<ShoppingList | null>(null);
 
   // 2. Movemos fetchLists fuera del useEffect y lo envolvemos en useCallback
   // Esto nos permite llamarlo desde cualquier parte y es una optimización de rendimiento.
@@ -62,6 +77,31 @@ export default function DashboardPage() {
     fetchLists();
   }, [token, isLoading, router, fetchLists]);
 
+  const handleDeleteList = async () => {
+    if (!listToDelete || !token) return;
+
+    const originalLists = lists;
+    setLists(currentLists => currentLists.filter(list => list.id !== listToDelete.id));
+
+    try {
+      const response = await fetch(`http://localhost:3000/shopping-lists/${listToDelete.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo eliminar la lista.');
+      }
+
+      toast({ title: "Lista eliminada", description: `La lista "${listToDelete.name}" ha sido eliminada.` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+      setLists(originalLists); // Revertir en caso de error
+    } finally {
+      setListToDelete(null); // Cierra el diálogo
+    }
+  };
+
   if (isLoading || isFetching) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -85,31 +125,56 @@ export default function DashboardPage() {
 
           {/* Mapeo de las listas existentes */}
           {lists.map((list) => (
-            <Link href={`/dashboard/lists/${list.id}`} key={list.id}>
-              <Card key={list.id} className="h-48 flex flex-col justify-between hover:shadow-lg hover:border-primary transition-all duration-200 cursor-pointer">
-                <CardHeader>
-                  <CardTitle>{list.name}</CardTitle>
-                  {list.budget && (
-                    <CardDescription>Presupuesto: ${list.budget}</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-500">
-                    {list.is_archived ? 'Archivada' : 'Activa'}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
+            <Card key={list.id} className="h-48 flex flex-col justify-between hover:shadow-lg hover:border-primary transition-all duration-200">
+              <Link href={`/dashboard/lists/${list.id}`} className="flex-grow flex flex-col">
+                  <CardHeader>
+                    <CardTitle>{list.name}</CardTitle>
+                    {list.budget && <CardDescription>Presupuesto: ${list.budget}</CardDescription>}
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-sm text-gray-500">
+                      {list.is_archived ? 'Archivada' : 'Activa'}
+                    </p>
+                  </CardContent>
+                </Link>
+                <CardFooter className="flex justify-end items-center pt-2">
+                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500" onClick={(e) => { e.stopPropagation(); setListToDelete(list); }}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
         </div>
 
-        {/* Muestra este mensaje si no se están cargando listas y el array está vacío */}
+        {/* Mensaje si no hay listas */}
         {!isFetching && lists.length === 0 && (
-           <div className="text-center mt-8 col-span-full">
-             <p className="text-gray-500">Aún no tienes listas. ¡Haz clic arriba para crear la primera!</p>
-           </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 mt-8">
+            <EmptyState
+              icon={ClipboardList}
+              title="No tienes listas de compras"
+              description="¡Comienza a organizarte! Haz clic en el botón de arriba para crear tu primera lista."
+            />
+          </div>
         )}
       </div>
+      {/* NUESTRO DIÁLOGO DE CONFIRMACIÓN */}
+      <AlertDialog open={!!listToDelete} onOpenChange={() => setListToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente tu lista
+              <span className="font-bold"> "{listToDelete?.name}"</span> y todos sus artículos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteList} className="bg-red-600 hover:bg-red-700">
+              Sí, eliminar lista
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

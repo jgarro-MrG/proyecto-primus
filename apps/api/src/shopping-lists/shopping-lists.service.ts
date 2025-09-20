@@ -61,15 +61,28 @@ export class ShoppingListsService {
   }
 
   async remove(id: number, userId: string) {
-    // Igualmente, verificamos la propiedad antes de borrar.
-    await this.findOne(id, userId);
-
-    return this.prisma.shoppingList.delete({
+    // Primero, verificamos que la lista exista y que pertenezca al usuario.
+    const list = await this.prisma.shoppingList.findUnique({
       where: { id },
     });
+
+    if (!list) {
+      throw new NotFoundException(`Shopping list with ID ${id} not found`);
+    }
+
+    if (list.user_id !== userId) {
+      throw new ForbiddenException('You do not have permission to delete this list');
+    }
+
+    // Si todo es correcto, eliminamos la lista.
+    await this.prisma.shoppingList.delete({
+      where: { id },
+    });
+
+    return; // No se devuelve contenido en una eliminación exitosa.
   }
 
-  // NUEVO MÉTODO: Para añadir un artículo a una lista
+  // Para añadir un artículo a una lista
   async addItemToList(listId: number, userId: string, createListItemDto: CreateListItemDto) {
     const { productName, quantity, price_per_unit } = createListItemDto;
 
@@ -175,4 +188,5 @@ export class ShoppingListsService {
     // No devolvemos nada en una operación de borrado exitosa (HTTP 204 No Content)
     return;
   }
+
 }
