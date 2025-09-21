@@ -146,12 +146,15 @@ export class ShoppingListsService {
     }
 
     // Construye el objeto de datos dinámicamente
-    const dataToUpdate: { is_checked?: boolean; quantity?: number } = {};
+    const dataToUpdate: { is_checked?: boolean; quantity?: number; price_per_unit?: number } = {};
     if (updateListItemDto.isChecked !== undefined) {
       dataToUpdate.is_checked = updateListItemDto.isChecked;
     }
     if (updateListItemDto.quantity !== undefined) {
       dataToUpdate.quantity = updateListItemDto.quantity;
+    }
+    if (updateListItemDto.price_per_unit !== undefined) {
+      dataToUpdate.price_per_unit = updateListItemDto.price_per_unit;
     }
 
     return this.prisma.listItem.update({

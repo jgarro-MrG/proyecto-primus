@@ -1,22 +1,21 @@
 // apps/web/src/app/dashboard/lists/[listId]/page.tsx
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Trash2, Pencil, ArrowLeft } from 'lucide-react';
+import { Trash2, Pencil, ArrowLeft, ShoppingCart, AlertTriangle } from 'lucide-react';
 import { EditListDialog } from '@/components/dashboard/EditListDialog';
 import { EditListItemDialog } from '@/components/dashboard/EditListItemDialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EmptyState } from '@/components/dashboard/EmptyState';
-import { ShoppingCart } from 'lucide-react';
 
 // Tipos para nuestros datos
 type Product = { id: number; name: string; };
@@ -39,6 +38,35 @@ export default function ListDetailPage() {
   const [isEditListOpen, setIsEditListOpen] = useState(false);
   const [isEditItemOpen, setIsEditItemOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ListItem | null>(null);
+
+  // calculo del total de la lista
+  const { checkedItemsTotal, estimatedListTotal, isOverBudget } = useMemo(() => {
+    if (!list?.items) {
+      return { checkedItemsTotal: 0, estimatedListTotal: 0, isOverBudget: false };
+    }
+
+    let checkedTotal = 0;
+    let estimatedTotal = 0;
+
+    for (const item of list.items) {
+      const itemPrice = item.price_per_unit || 0;
+      const itemTotal = itemPrice * item.quantity;
+
+      estimatedTotal += itemTotal;
+      if (item.is_checked) {
+        checkedTotal += itemTotal;
+      }
+    }
+
+    // Nueva comprobación: ¿El total estimado supera el presupuesto?
+    const overBudget = list.budget != null && estimatedTotal > list.budget;
+
+    return {
+      checkedItemsTotal: checkedTotal,
+      estimatedListTotal: estimatedTotal,
+      isOverBudget: overBudget,
+    };
+  }, [list]); // Se re-ejecutará si la lista cambia
 
   const fetchListDetails = useCallback(async () => {
     if (!token || !listId) return;
@@ -215,6 +243,12 @@ export default function ListDetailPage() {
                           </label>
                         </div>
                         <div className="flex items-center gap-4">
+                          {/* Mostramos el precio si existe */}
+                          {item.price_per_unit && (
+                            <span className="text-sm font-semibold text-gray-800">
+                              ${item.price_per_unit.toFixed(2)}
+                            </span>
+                          )}
                           <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>
                             Cantidad: {item.quantity}
                           </span>
@@ -239,6 +273,26 @@ export default function ListDetailPage() {
                   )}
                 </div>
               </CardContent>
+              {/* --- SECCIÓN DE TOTALES --- */}
+              <CardFooter className="flex justify-between items-center bg-gray-50 p-4 mt-4 rounded-b-lg border-t">
+                <div>
+                  <p className="text-sm text-gray-600">Total del Carrito</p>
+                  <p className="text-xl font-bold text-green-600">${checkedItemsTotal.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Total Estimado</p>
+                  {/* Aplicamos clases condicionales para la alerta */}
+                  <div className={cn("flex items-center justify-end gap-2", isOverBudget && "text-red-500")}>
+                    {isOverBudget && <AlertTriangle className="h-5 w-5" />}
+                    <p className="text-xl font-bold">
+                      ${estimatedListTotal.toFixed(2)}
+                    </p>
+                  </div>
+                  {list.budget != null && (
+                    <p className="text-xs text-gray-400">Presupuesto: ${list.budget.toFixed(2)}</p>
+                  )}
+                </div>
+              </CardFooter>
             </Card>
 
             <EditListDialog

@@ -13,9 +13,10 @@ import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   quantity: z.coerce.number().int().min(1, { message: "La cantidad debe ser al menos 1." }),
+  price_per_unit: z.coerce.number().positive().optional(),
 });
 
-type ListItem = { id: number; quantity: number; product: { name: string; }; };
+type ListItem = { id: number; quantity: number; price_per_unit: number | null; product: { name: string; }; };
 
 interface EditListItemDialogProps {
   item: ListItem | null;
@@ -68,6 +69,18 @@ export function EditListItemDialog({ item, listId, token, onItemUpdated, isOpen,
                 <FormItem>
                   <FormLabel>Nueva Cantidad</FormLabel>
                   <FormControl><Input type="number" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* NUEVO CAMPO DE PRECIO */}
+            <FormField
+              control={form.control}
+              name="price_per_unit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Precio por Unidad (Opcional)</FormLabel>
+                  <FormControl><Input type="number" step="0.01" placeholder="Ej: 1.99" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}

@@ -1,5 +1,5 @@
 // apps/api/src/shopping-lists/dto/update-list-item.dto.ts
-import { IsBoolean, IsNotEmpty, IsInt, IsOptional, Min } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsInt, IsOptional, Min, IsNumber} from 'class-validator';
 
 export class UpdateListItemDto {
   @IsBoolean()
@@ -11,4 +11,9 @@ export class UpdateListItemDto {
   @Min(1)
   @IsOptional()
   quantity?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  price_per_unit?: number;
 }
