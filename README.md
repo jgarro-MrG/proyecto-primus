@@ -1,135 +1,55 @@
-# Turborepo starter
+Proyecto: Aplicación de Lista de Compras Inteligente
+1. Visión General
+El objetivo de este proyecto es desarrollar una aplicación móvil y web integral que asista a los usuarios en la planificación, presupuesto y ejecución de sus compras de supermercado y otras tiendas. La aplicación no solo permitirá crear y gestionar listas, sino que también ofrecerá funcionalidades inteligentes como la categorización automática de productos para optimizar la ruta en la tienda, seguimiento de presupuestos, y gestión de promociones.
 
-This Turborepo starter is maintained by the Turborepo core team.
+Esta iniciativa nace de la necesidad de transformar una tarea cotidiana en un proceso más eficiente, organizado y consciente del gasto.
 
-## Using this example
+2. Problema a Solucionar
+Muchas personas enfrentan desafíos comunes al hacer sus compras:
 
-Run the following command:
+Olvido de productos: Es fácil olvidar artículos necesarios si no se lleva una lista organizada.
 
-```sh
-npx create-turbo@latest
-```
+Compras por impulso: La falta de planificación lleva a compras innecesarias que afectan el presupuesto.
 
-## What's inside?
+Pérdida de tiempo en la tienda: Recorrer los pasillos de manera desordenada buscando productos consume tiempo valioso. Los productos frescos o congelados pueden perder calidad si se recogen al principio.
 
-This Turborepo includes the following packages/apps:
+Dificultad para seguir un presupuesto: Es complicado llevar la cuenta del costo total de los artículos en el carrito en tiempo real.
 
-### Apps and Packages
+Desaprovechamiento de ofertas: Los usuarios a menudo no están al tanto de las promociones o no las recuerdan al momento de la compra.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+3. Solución Propuesta
+Nuestra aplicación ofrecerá una solución completa a través de las siguientes funcionalidades clave:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Gestión de Múltiples Listas: Los usuarios podrán crear, editar y archivar listas de compras para diferentes tiendas o eventos (ej. "Compras Semanales", "Fiesta de Cumpleaños").
 
-### Utilities
+Catálogo de Productos Inteligente: Un sistema para agregar productos que aprenderá de los hábitos del usuario. Los productos se podrán categorizar (ej. Frutas y Verduras, Lácteos, Carnes, Limpieza).
 
-This Turborepo has some additional tools already setup for you:
+Organización por Pasillo/Categoría: La aplicación ordenará automáticamente los productos de la lista según la disposición típica de un supermercado (ej. Frutas y Verduras primero, Congelados al final), haciendo el recorrido más eficiente.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+Control de Presupuesto: Los usuarios podrán asignar un presupuesto a cada lista. La aplicación mostrará el costo total estimado y permitirá marcar los productos a medida que se añaden al carrito, actualizando el subtotal.
 
-### Build
+Gestión de Tiendas y Promociones: Se podrá llevar un registro de tiendas favoritas y asociar productos o listas a tiendas específicas. También habrá una sección para registrar ofertas y promociones.
 
-To build all apps and packages, run the following command:
+Perfiles de Usuario: Cada usuario tendrá su propio perfil para gestionar sus listas, productos frecuentes y configuraciones personales.
 
-```
-cd my-turborepo
+4. Público Objetivo
+Esta aplicación está dirigida a:
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+Jefes de hogar y familias: Quienes buscan optimizar el presupuesto familiar y el tiempo dedicado a las compras.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+Estudiantes y jóvenes independientes: Que necesitan una herramienta para controlar sus gastos y organizar sus compras de manera sencilla.
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Personas con dietas específicas: Que requieren comprar ingredientes particulares y no pueden permitirse olvidar nada.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+Cualquier persona que desee hacer sus compras de una manera más estructurada e inteligente.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+5. Visión a Futuro
+A largo plazo, la aplicación podría expandirse para incluir:
 
-### Develop
+Listas colaborativas: Permitir que varios miembros de la familia compartan y editen una misma lista en tiempo real.
 
-To develop all apps and packages, run the following command:
+Integración con tiendas online: Sincronizar la lista con servicios de compra en línea para facilitar pedidos a domicilio.
 
-```
-cd my-turborepo
+Análisis de gastos: Generar reportes sobre los hábitos de compra del usuario.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Recomendaciones basadas en IA: Sugerir productos basados en compras anteriores o recetas.
