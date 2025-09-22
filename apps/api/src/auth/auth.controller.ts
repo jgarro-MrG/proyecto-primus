@@ -1,5 +1,6 @@
 // apps/api/src/auth/auth.controller.ts
 import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -21,8 +22,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt')) // <-- ¡Esta es la magia!
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user; // req.user es adjuntado por la JwtStrategy
+  getProfile(@Request() req: ExpressRequest) {
+    return req.user;
   }
 
 }

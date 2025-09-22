@@ -1,0 +1,121 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=api"
+
+• Packages in scope: api
+• Running dev in 1 packages
+• Remote caching disabled
+api:dev: cache bypass, force executing fdc11b7497fd78d8
+api:dev: 
+api:dev: > api@0.0.1 dev C:\d\repos\proyecto-primus\apps\api
+api:dev: > nest start --watch
+api:dev: 
+api:dev: [2J[3J[H[[90m3:47:18 AM[0m] Starting compilation in watch mode...
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m20[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m20[0m     const existingUser = await this.prisma.user.findUnique({ where: { email } });
+api:dev: [7m  [0m [91m                                           ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m29[0m:[93m40[0m - [91merror[0m[90m TS2339: [0mProperty 'role' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m29[0m     const userRole = await this.prisma.role.findUnique({ where: { name: 'user' } });
+api:dev: [7m  [0m [91m                                       ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m36[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m36[0m     const user = await this.prisma.user.create({
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m53[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m53[0m     const user = await this.prisma.user.findUnique({ where: { email: loginDto.email } });
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/jwt.strategy.ts[0m:[93m18[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m18[0m     const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/prisma/prisma.service.ts[0m:[93m3[0m:[93m10[0m - [91merror[0m[90m TS2305: [0mModule '"@prisma/client"' has no exported member 'PrismaClient'.
+api:dev: 
+api:dev: [7m3[0m import { PrismaClient } from 'database';
+api:dev: [7m [0m [91m         ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/prisma/prisma.service.ts[0m:[93m8[0m:[93m16[0m - [91merror[0m[90m TS2339: [0mProperty '$connect' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m8[0m     await this.$connect();
+api:dev: [7m [0m [91m               ~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m14[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m14[0m     return this.prisma.shoppingList.create({
+api:dev: [7m  [0m [91m                       ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m23[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m23[0m     return this.prisma.shoppingList.findMany({
+api:dev: [7m  [0m [91m                       ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m29[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m29[0m     const list = await this.prisma.shoppingList.findUnique({
+api:dev: [7m  [0m [91m                                   ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m57[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m57[0m     return this.prisma.shoppingList.update({
+api:dev: [7m  [0m [91m                       ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m65[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m65[0m     const list = await this.prisma.shoppingList.findUnique({
+api:dev: [7m  [0m [91m                                   ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m78[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m78[0m     await this.prisma.shoppingList.delete({
+api:dev: [7m  [0m [91m                      ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m90[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m90[0m     const list = await this.prisma.shoppingList.findUnique({ where: { id: listId } });
+api:dev: [7m  [0m [91m                                   ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m97[0m:[93m37[0m - [91merror[0m[90m TS2339: [0mProperty 'product' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m97[0m     let product = await this.prisma.product.findFirst({
+api:dev: [7m  [0m [91m                                    ~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m109[0m:[93m35[0m - [91merror[0m[90m TS2339: [0mProperty 'product' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m109[0m       product = await this.prisma.product.create({
+api:dev: [7m   [0m [91m                                  ~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m118[0m:[93m40[0m - [91merror[0m[90m TS2339: [0mProperty 'listItem' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m118[0m     const listItem = await this.prisma.listItem.create({
+api:dev: [7m   [0m [91m                                       ~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m134[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m134[0m     const list = await this.prisma.shoppingList.findUnique({
+api:dev: [7m   [0m [91m                                   ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m160[0m:[93m24[0m - [91merror[0m[90m TS2339: [0mProperty 'listItem' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m160[0m     return this.prisma.listItem.update({
+api:dev: [7m   [0m [91m                       ~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m171[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'shoppingList' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m171[0m     const list = await this.prisma.shoppingList.findUnique({
+api:dev: [7m   [0m [91m                                   ~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m187[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'listItem' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m187[0m     await this.prisma.listItem.delete({
+api:dev: [7m   [0m [91m                      ~~~~~~~~[0m
+api:dev: 
+api:dev: [[90m3:47:21 AM[0m] Found 21 errors. Watching for file changes.
+api:dev: 

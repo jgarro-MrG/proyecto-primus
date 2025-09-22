@@ -1,6 +1,6 @@
 // apps/api/src/shopping-lists/shopping-lists.service.ts
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateShoppingListDto } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
 import { CreateListItemDto } from './dto/create-list-item.dto';

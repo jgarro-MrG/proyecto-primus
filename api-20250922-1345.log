@@ -1,0 +1,39 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=api"
+
+• Packages in scope: api
+• Running dev in 1 packages
+• Remote caching disabled
+api:dev: cache bypass, force executing d7a4316f84b0a8a0
+api:dev: 
+api:dev: > api@0.0.1 dev C:\d\repos\proyecto-primus\apps\api
+api:dev: > nest start --watch --preserveWatchOutput
+api:dev: 
+api:dev: [[90m1:45:39 PM[0m] Starting compilation in watch mode...
+api:dev: 
+api:dev: [[90m1:45:44 PM[0m] Found 0 errors. Watching for file changes.
+api:dev: 
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +23ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +3ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mShoppingListsModule dependencies initialized[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/}:[39m[38;5;3m +4ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/, GET} route[39m[38;5;3m +3ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/auth}:[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/register, POST} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/login, POST} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/auth/profile, GET} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mShoppingListsController {/shopping-lists}:[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists, POST} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists, GET} route[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:id, GET} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:id, PATCH} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:id, DELETE} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:listId/items, POST} route[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:listId/items/:itemId, PATCH} route[39m[38;5;3m +1ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/shopping-lists/:listId/items/:itemId, DELETE} route[39m[38;5;3m +0ms[39m
+api:dev: [32m[Nest] 11032  - [39m09/22/2025, 1:45:46 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +27ms[39m

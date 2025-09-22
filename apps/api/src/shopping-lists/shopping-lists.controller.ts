@@ -1,5 +1,6 @@
 // apps/api/src/shopping-lists/shopping-lists.controller.ts
 import { Controller, Get, Post, Body, Param, UseGuards, Request, ParseIntPipe, Patch, Delete } from '@nestjs/common';
+// import { Request as ExpressRequest } from 'express';
 import { ShoppingListsService } from './shopping-lists.service';
 import { CreateShoppingListDto } from './dto/create-shopping-list.dto';
 import { UpdateShoppingListDto } from './dto/update-shopping-list.dto';
@@ -7,6 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateListItemDto } from './dto/create-list-item.dto';
 import { UpdateListItemDto } from './dto/update-list-item.dto';
 import { /*...,*/ HttpCode } from '@nestjs/common';
+import { RequestWithUser } from '../auth/interfaces/request-with-user.interface'; // <-- Import your new interface
 
 @UseGuards(AuthGuard('jwt')) // <-- Protege todas las rutas de este controlador
 @Controller('shopping-lists')
@@ -14,19 +16,19 @@ export class ShoppingListsController {
   constructor(private readonly shoppingListsService: ShoppingListsService) {}
 
   @Post()
-  create(@Body() createDto: CreateShoppingListDto, @Request() req) {
+  create(@Body() createDto: CreateShoppingListDto, @Request() req: RequestWithUser) {
     const userId = req.user.id;
     return this.shoppingListsService.create(createDto, userId);
   }
 
   @Get()
-  findAll(@Request() req) {
+  findAll(@Request() req: RequestWithUser) {
     const userId = req.user.id;
     return this.shoppingListsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() req) { // <-- ID es número, usa ParseIntPipe
+  findOne(@Param('id', ParseIntPipe) id: number, @Request() req: RequestWithUser) { // <-- ID es número, usa ParseIntPipe
     const userId = req.user.id;
     return this.shoppingListsService.findOne(id, userId);
   }
@@ -35,14 +37,14 @@ export class ShoppingListsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateShoppingListDto,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     const userId = req.user.id;
     return this.shoppingListsService.update(id, updateDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req: RequestWithUser) {
     const userId = req.user.id;
     return this.shoppingListsService.remove(id, userId);
   }
@@ -50,7 +52,7 @@ export class ShoppingListsController {
   @Post(':listId/items')
   addItem(
     @Param('listId', ParseIntPipe) listId: number,
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Body() createListItemDto: CreateListItemDto,
   ) {
     return this.shoppingListsService.addItemToList(listId, req.user.id, createListItemDto);
@@ -60,7 +62,7 @@ export class ShoppingListsController {
   updateItem(
     @Param('listId', ParseIntPipe) listId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Body() updateListItemDto: UpdateListItemDto,
   ) {
     return this.shoppingListsService.updateListItem(listId, itemId, req.user.id, updateListItemDto);
@@ -71,7 +73,7 @@ export class ShoppingListsController {
   deleteItem(
     @Param('listId', ParseIntPipe) listId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     return this.shoppingListsService.deleteListItem(listId, itemId, req.user.id);
   }

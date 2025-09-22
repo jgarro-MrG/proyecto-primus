@@ -1,0 +1,121 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=api"
+
+• Packages in scope: api
+• Running dev in 1 packages
+• Remote caching disabled
+api:dev: cache bypass, force executing 241579c433bd5ba9
+api:dev: 
+api:dev: > api@0.0.1 dev C:\d\repos\proyecto-primus\apps\api
+api:dev: > nest start --watch --preserveWatchOutput
+api:dev: 
+api:dev: [[90m1:11:35 PM[0m] Starting compilation in watch mode...
+api:dev: 
+api:dev: [96msrc/auth/auth.controller.ts[0m:[93m24[0m:[93m14[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m24[0m   getProfile(@Request() req) {
+api:dev: [7m  [0m [91m             ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.module.ts[0m:[93m8[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module 'src/prisma/prisma.module' or its corresponding type declarations.
+api:dev: 
+api:dev: [7m8[0m import { PrismaModule } from 'src/prisma/prisma.module'; // <-- Añade esta importación
+api:dev: [7m [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m20[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m20[0m     const existingUser = await this.prisma.user.findUnique({ where: { email } });
+api:dev: [7m  [0m [91m                                           ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m29[0m:[93m40[0m - [91merror[0m[90m TS2339: [0mProperty 'role' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m29[0m     const userRole = await this.prisma.role.findUnique({ where: { name: 'user' } });
+api:dev: [7m  [0m [91m                                       ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m36[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m36[0m     const user = await this.prisma.user.create({
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/auth.service.ts[0m:[93m53[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m53[0m     const user = await this.prisma.user.findUnique({ where: { email: loginDto.email } });
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/auth/jwt.strategy.ts[0m:[93m18[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m18[0m     const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+api:dev: [7m  [0m [91m                                   ~~~~[0m
+api:dev: 
+api:dev: [96msrc/prisma/prisma.service.ts[0m:[93m3[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module 'database' or its corresponding type declarations.
+api:dev: 
+api:dev: [7m3[0m import { PrismaClient } from 'database';
+api:dev: [7m [0m [91m                             ~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/prisma/prisma.service.ts[0m:[93m8[0m:[93m16[0m - [91merror[0m[90m TS2339: [0mProperty '$connect' does not exist on type 'PrismaService'.
+api:dev: 
+api:dev: [7m8[0m     await this.$connect();
+api:dev: [7m [0m [91m               ~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m17[0m:[93m52[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m17[0m   create(@Body() createDto: CreateShoppingListDto, @Request() req) {
+api:dev: [7m  [0m [91m                                                   ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m23[0m:[93m11[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m23[0m   findAll(@Request() req) {
+api:dev: [7m  [0m [91m          ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m29[0m:[93m50[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m29[0m   findOne(@Param('id', ParseIntPipe) id: number, @Request() req) { // <-- ID es número, usa ParseIntPipe
+api:dev: [7m  [0m [91m                                                 ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m38[0m:[93m5[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m38[0m     @Request() req,
+api:dev: [7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m45[0m:[93m49[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m45[0m   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+api:dev: [7m  [0m [91m                                                ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m53[0m:[93m5[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m53[0m     @Request() req,
+api:dev: [7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m63[0m:[93m5[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m63[0m     @Request() req,
+api:dev: [7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.controller.ts[0m:[93m74[0m:[93m5[0m - [91merror[0m[90m TS7006: [0mParameter 'req' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m74[0m     @Request() req,
+api:dev: [7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.module.ts[0m:[93m5[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module 'src/prisma/prisma.module' or its corresponding type declarations.
+api:dev: 
+api:dev: [7m5[0m import { PrismaModule } from 'src/prisma/prisma.module'; // <-- Añade esta importación
+api:dev: [7m [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m3[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module 'src/prisma/prisma.service' or its corresponding type declarations.
+api:dev: 
+api:dev: [7m3[0m import { PrismaService } from 'src/prisma/prisma.service';
+api:dev: [7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m143[0m:[93m40[0m - [91merror[0m[90m TS7006: [0mParameter 'item' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m143[0m     const itemExists = list.items.some(item => item.id === itemId);
+api:dev: [7m   [0m [91m                                       ~~~~[0m
+api:dev: 
+api:dev: [96msrc/shopping-lists/shopping-lists.service.ts[0m:[93m181[0m:[93m40[0m - [91merror[0m[90m TS7006: [0mParameter 'item' implicitly has an 'any' type.
+api:dev: 
+api:dev: [7m181[0m     const itemExists = list.items.some(item => item.id === itemId);
+api:dev: [7m   [0m [91m                                       ~~~~[0m
+api:dev: 
+api:dev: [[90m1:11:40 PM[0m] Found 21 errors. Watching for file changes.
+api:dev: 

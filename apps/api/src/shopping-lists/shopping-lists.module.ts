@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { ShoppingListsService } from './shopping-lists.service';
 import { ShoppingListsController } from './shopping-lists.controller';
-import { PrismaModule } from 'src/prisma/prisma.module'; // <-- Añade esta importación
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule], // <-- Añade el módulo aquí

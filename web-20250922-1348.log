@@ -1,0 +1,28 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=web"
+
+• Packages in scope: web
+• Running dev in 1 packages
+• Remote caching disabled
+web:dev: cache bypass, force executing 8416e6c5a4480681
+web:dev: 
+web:dev: > web@0.1.0 dev C:\d\repos\proyecto-primus\apps\web
+web:dev: > next dev -p 3001
+web:dev: 
+web:dev:  ⨯ Failed to start server
+web:dev: Error: listen EADDRINUSE: address already in use :::3001
+web:dev:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3001)
+web:dev:     at new Promise (<anonymous>) {
+web:dev:   code: 'EADDRINUSE',
+web:dev:   errno: -4091,
+web:dev:   syscall: 'listen',
+web:dev:   address: '::',
+web:dev:   port: 3001
+web:dev: }
+web:dev: [?25h
+
+ Tasks:    1 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    2.625s 
+

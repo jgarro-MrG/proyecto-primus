@@ -1,0 +1,28 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=api"
+
+• Packages in scope: api
+• Running dev in 1 packages
+• Remote caching disabled
+api:dev: cache bypass, force executing fdc11b7497fd78d8
+api:dev: 
+api:dev: > api@0.0.1 dev C:\d\repos\proyecto-primus\apps\api
+api:dev: > nest start --watch
+api:dev: 
+api:dev: [2J[3J[H[[90m3:38:34 AM[0m] Starting compilation in watch mode...
+api:dev: 
+api:dev: [[90m3:38:38 AM[0m] Found 0 errors. Watching for file changes.
+api:dev: 
+api:dev: [32m[Nest] 7136  - [39m09/22/2025, 3:38:40 AM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+api:dev: [31m[Nest] 7136  - [39m09/22/2025, 3:38:40 AM [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39mError: @prisma/client did not initialize yet. Please run "prisma generate" and try to import it again.
+api:dev:     at new PrismaClient (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@prisma+client@6.16.1_prisma@6.16.2_typescript@5.9.2__typescript@5.9.2\node_modules\[4m.prisma[24m\client\default.js:43:11)
+api:dev:     at new PrismaService [90m(C:\d\repos\proyecto-primus\apps\api\[39msrc\prisma\prisma.service.ts:6:8[90m)[39m
+api:dev:     at Injector.instantiateClass (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\injector.js:418:19)
+api:dev:     at callback (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\injector.js:70:45)
+api:dev:     at async Injector.resolveConstructorParams (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\injector.js:170:24)
+api:dev:     at async Injector.loadInstance (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\injector.js:75:13)
+api:dev:     at async Injector.loadProvider (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\injector.js:103:9)
+api:dev:     at async C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\instance-loader.js:56:13
+api:dev:     at async Promise.all (index 3)
+api:dev:     at async InstanceLoader.createInstancesOfProviders (C:\d\repos\proyecto-primus\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.6_@nestjs+common@11.1.6_class-transformer@0.5.1_class-validator@0.14.2_refl_xrbfpk3oeicx3sxh6yd3xlmfoi\node_modules\[4m@nestjs[24m\core\injector\instance-loader.js:55:9)

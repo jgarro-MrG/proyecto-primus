@@ -1,0 +1,8 @@
+
+> primus@ dev C:\d\repos\proyecto-primus
+> turbo run dev "--filter=api"
+
+• Packages in scope: api
+• Running dev in 1 packages
+• Remote caching disabled
+api:dev: cache bypass, force executing c1acc70bb7e9c219
