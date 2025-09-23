@@ -228,130 +228,129 @@ export default function ListDetailPage() {
     e.preventDefault();
     if (!token || !newItemName.trim()) return;
 
-    //   try {
-    //     const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items`, {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    //       body: JSON.stringify({ productName: newItemName, quantity: 1 }),
-    //     });
-    //     if (!response.ok) throw new Error('No se pudo añadir el artículo.');
+    try {
+      const response = await fetch(`http://localhost:3000/shopping-lists/${listId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ productName: newItemName, quantity: 1 }),
+      });
+      if (!response.ok) throw new Error('No se pudo añadir el artículo.');
 
-    //     setNewItemName('');
-    //     await fetchListDetails(); // Refresca la lista para mostrar el nuevo artículo
-    //   } catch (err: any) {
-    //     toast({ title: "Error", description: err.message, variant: "destructive" });
-    //   }
-    // };
-
-    if (isFetching || isAuthLoading) {
-      return <div className="flex h-screen items-center justify-center"><LoadingSpinner className="h-12 w-12" /></div>;
+      setNewItemName('');
+      await fetchListDetails(); // Refresca la lista para mostrar el nuevo artículo
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
+  };
 
-    return (
-      <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          <header className="mb-4">
-            <Button variant="ghost" onClick={() => router.push('/dashboard')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al Dashboard
-            </Button>
-          </header>
-
-          {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
-
-          {list && token && (
-            <>
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-4xl">{list.name}</CardTitle>
-                      {list.budget && <CardDescription>Presupuesto: ${list.budget}</CardDescription>}
-                    </div>
-                    <Button variant="outline" size="icon" onClick={() => setIsEditListOpen(true)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleAddItem} className="flex gap-2 mb-4">
-                    <Input
-                      placeholder="Añadir nuevo artículo..."
-                      value={newItemName}
-                      onChange={(e) => setNewItemName(e.target.value)}
-                    />
-                    <Button type="submit">Añadir</Button>
-                  </form>
-
-                  <div className="space-y-4 mt-6">
-                    {sortedCategories.length > 0 ? (
-                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                        <SortableContext items={sortedCategories.map(name => groupedItems[name].id)} strategy={verticalListSortingStrategy}>
-                          <Accordion type="multiple" value={activeAccordionItems} onValueChange={setActiveAccordionItems} className="w-full">
-                            {sortedCategories.map((categoryName) => {
-                              const group = groupedItems[categoryName];
-                              const sortedItems = [...group.items].sort((a, b) => Number(a.is_checked) - Number(b.is_checked));
-                              return (
-                                <SortableAccordionItem key={group.id} categoryName={categoryName} group={group}>
-                                  <div className="space-y-2 pt-2">
-                                    {sortedItems.map(item => (
-                                      <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
-                                        <div className="flex items-center gap-3">
-                                          <Checkbox id={`item-${item.id}`} checked={item.is_checked} onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)} />
-                                          <label htmlFor={`item-${item.id}`} className={cn("font-medium cursor-pointer", item.is_checked && "line-through text-gray-500")}>
-                                            {item.product.name}
-                                          </label>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                          {item.price_per_unit != null ? (<span className="text-sm font-semibold text-gray-800">${item.price_per_unit.toFixed(2)}</span>) : null}
-                                          <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>Cantidad: {item.quantity}</span>
-                                          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteItem(item.id)}>
-                                            <Trash2 className="h-4 w-4" />
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </SortableAccordionItem>
-                              );
-                            })}
-                          </Accordion>
-                        </SortableContext>
-                      </DndContext>
-                    ) : (
-                      <EmptyState icon={ShoppingCart} title="Tu lista está vacía" description="Usa el formulario de arriba para añadir tu primer artículo." className="mt-6" />
-                    )}
-                  </div>
-                </CardContent>
-                {/* --- SECCIÓN DE TOTALES --- */}
-                <CardFooter className="flex justify-between items-center bg-gray-50 p-4 mt-4 rounded-b-lg border-t">
-                  <div>
-                    <p className="text-sm text-gray-600">Total del Carrito</p>
-                    <p className="text-xl font-bold text-green-600">${checkedItemsTotal.toFixed(2)}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Total Estimado</p>
-                    {/* Aplicamos clases condicionales para la alerta */}
-                    <div className={cn("flex items-center justify-end gap-2", isOverBudget && "text-red-500")}>
-                      {isOverBudget && <AlertTriangle className="h-5 w-5" />}
-                      <p className="text-xl font-bold">
-                        ${estimatedListTotal.toFixed(2)}
-                      </p>
-                    </div>
-                    {list.budget != null && (
-                      <p className="text-xs text-gray-400">Presupuesto: ${list.budget.toFixed(2)}</p>
-                    )}
-                  </div>
-                </CardFooter>
-              </Card>
-
-              <AddItemDialog listId={list.id} token={token} onItemAdded={onItemAdded} isOpen={isAddItemOpen} setIsOpen={setIsAddItemOpen} initialProductName={newItemName} />
-              <EditListDialog list={list} token={token} onListUpdated={fetchListDetails} isOpen={isEditListOpen} setIsOpen={setIsEditListOpen} />
-              <EditListItemDialog item={selectedItem} listId={list.id} token={token} onItemUpdated={fetchListDetails} isOpen={isEditItemOpen} setIsOpen={setIsEditItemOpen} />
-            </>
-          )}
-        </div>
-      </div>
-    );
+  if (isFetching || isAuthLoading) {
+    return <div className="flex h-screen items-center justify-center"><LoadingSpinner className="h-12 w-12" /></div>;
   }
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-4">
+          <Button variant="ghost" onClick={() => router.push('/dashboard')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver al Dashboard
+          </Button>
+        </header>
+
+        {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
+
+        {list && token && (
+          <>
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-4xl">{list.name}</CardTitle>
+                    {list.budget && <CardDescription>Presupuesto: ${list.budget}</CardDescription>}
+                  </div>
+                  <Button variant="outline" size="icon" onClick={() => setIsEditListOpen(true)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAddItem} className="flex gap-2 mb-4">
+                  <Input
+                    placeholder="Añadir nuevo artículo..."
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                  />
+                  <Button type="submit">Añadir</Button>
+                </form>
+
+                <div className="space-y-4 mt-6">
+                  {sortedCategories.length > 0 ? (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <SortableContext items={sortedCategories.map(name => groupedItems[name].id)} strategy={verticalListSortingStrategy}>
+                        <Accordion type="multiple" value={activeAccordionItems} onValueChange={setActiveAccordionItems} className="w-full">
+                          {sortedCategories.map((categoryName) => {
+                            const group = groupedItems[categoryName];
+                            const sortedItems = [...group.items].sort((a, b) => Number(a.is_checked) - Number(b.is_checked));
+                            return (
+                              <SortableAccordionItem key={group.id} categoryName={categoryName} group={group}>
+                                <div className="space-y-2 pt-2">
+                                  {sortedItems.map(item => (
+                                    <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
+                                      <div className="flex items-center gap-3">
+                                        <Checkbox id={`item-${item.id}`} checked={item.is_checked} onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)} />
+                                        <label htmlFor={`item-${item.id}`} className={cn("font-medium cursor-pointer", item.is_checked && "line-through text-gray-500")}>
+                                          {item.product.name}
+                                        </label>
+                                      </div>
+                                      <div className="flex items-center gap-4">
+                                        {item.price_per_unit != null ? (<span className="text-sm font-semibold text-gray-800">${item.price_per_unit.toFixed(2)}</span>) : null}
+                                        <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>Cantidad: {item.quantity}</span>
+                                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteItem(item.id)}>
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </SortableAccordionItem>
+                            );
+                          })}
+                        </Accordion>
+                      </SortableContext>
+                    </DndContext>
+                  ) : (
+                    <EmptyState icon={ShoppingCart} title="Tu lista está vacía" description="Usa el formulario de arriba para añadir tu primer artículo." className="mt-6" />
+                  )}
+                </div>
+              </CardContent>
+              {/* --- SECCIÓN DE TOTALES --- */}
+              <CardFooter className="flex justify-between items-center bg-gray-50 p-4 mt-4 rounded-b-lg border-t">
+                <div>
+                  <p className="text-sm text-gray-600">Total del Carrito</p>
+                  <p className="text-xl font-bold text-green-600">${checkedItemsTotal.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Total Estimado</p>
+                  {/* Aplicamos clases condicionales para la alerta */}
+                  <div className={cn("flex items-center justify-end gap-2", isOverBudget && "text-red-500")}>
+                    {isOverBudget && <AlertTriangle className="h-5 w-5" />}
+                    <p className="text-xl font-bold">
+                      ${estimatedListTotal.toFixed(2)}
+                    </p>
+                  </div>
+                  {list.budget != null && (
+                    <p className="text-xs text-gray-400">Presupuesto: ${list.budget.toFixed(2)}</p>
+                  )}
+                </div>
+              </CardFooter>
+            </Card>
+
+            <AddItemDialog listId={list.id} token={token} onItemAdded={onItemAdded} isOpen={isAddItemOpen} setIsOpen={setIsAddItemOpen} initialProductName={newItemName} />
+            <EditListDialog list={list} token={token} onListUpdated={fetchListDetails} isOpen={isEditListOpen} setIsOpen={setIsEditListOpen} />
+            <EditListItemDialog item={selectedItem} listId={list.id} token={token} onItemUpdated={fetchListDetails} isOpen={isEditItemOpen} setIsOpen={setIsEditItemOpen} />
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
