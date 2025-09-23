@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -16,28 +15,52 @@ import { EditListDialog } from '@/components/dashboard/EditListDialog';
 import { EditListItemDialog } from '@/components/dashboard/EditListItemDialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EmptyState } from '@/components/dashboard/EmptyState';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
 
 // Tipos para nuestros datos
-type Product = { id: number; name: string; };
+type Category = { id: number; name: string; display_order: number; };
+type Product = { id: number; name: string; category: Category | null; };
 type ListItem = { id: number; quantity: number; price_per_unit: number | null; product: Product; is_checked: boolean; };
 type ShoppingList = { id: number; name: string; budget: number | null; is_archived: boolean; items: ListItem[]; };
+type GroupedItems = { [categoryName: string]: { items: ListItem[], order: number } };
 
 export default function ListDetailPage() {
   const { token, isLoading: isAuthLoading } = useAuth();
-  const router = useRouter();
-  const params = useParams();
-  const { listId } = params;
-  const { toast } = useToast();
-
   const [list, setList] = useState<ShoppingList | null>(null);
+  const { listId } = useParams();
+  const router = useRouter();
+  const { toast } = useToast();
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newItemName, setNewItemName] = useState('');
-
-  // Estados para controlar los diálogos de edición
   const [isEditListOpen, setIsEditListOpen] = useState(false);
   const [isEditItemOpen, setIsEditItemOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ListItem | null>(null);
+  const [activeAccordionItems, setActiveAccordionItems] = useState<string[]>([]);
+
+  const groupedItems = useMemo(() => {
+    if (!list?.items) return {};
+    const groups = list.items.reduce((acc: GroupedItems, item) => {
+      const categoryName = item.product.category?.name || 'Sin Categoría';
+      const categoryOrder = item.product.category?.display_order || 999; // 'Sin Categoría' va al final
+      if (!acc[categoryName]) {
+        acc[categoryName] = { items: [], order: categoryOrder };
+      }
+      acc[categoryName].items.push(item);
+      return acc;
+    }, {});
+    // Abre todos los acordeones por defecto la primera vez que se cargan los grupos
+    if (Object.keys(activeAccordionItems).length === 0 && Object.keys(groups).length > 0) {
+        setActiveAccordionItems(Object.keys(groups));
+    }
+    return groups;
+  }, [list, activeAccordionItems]);
+
+  const sortedCategories = useMemo(() => {
+    return Object.keys(groupedItems).sort((a, b) => groupedItems[a].order - groupedItems[b].order);
+  }, [groupedItems]);
+  
 
   // calculo del total de la lista
   const { checkedItemsTotal, estimatedListTotal, isOverBudget } = useMemo(() => {
@@ -225,51 +248,44 @@ export default function ListDetailPage() {
                   <Button type="submit">Añadir</Button>
                 </form>
 
-                <div className="space-y-2 mt-6">
-                  {list.items.length > 0 ? (
-                    [...list.items].sort((a, b) => Number(a.is_checked) - Number(b.is_checked)).map(item => (
-                      <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            id={`item-${item.id}`}
-                            checked={item.is_checked}
-                            onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)}
-                          />
-                          <label
-                            htmlFor={`item-${item.id}`}
-                            className={cn("font-medium cursor-pointer", item.is_checked && "line-through text-gray-500")}
-                          >
-                            {item.product.name}
-                          </label>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          {/* Mostramos el precio si existe */}
-                          {item.price_per_unit && (
-                            <span className="text-sm font-semibold text-gray-800">
-                              ${item.price_per_unit.toFixed(2)}
-                            </span>
-                          )}
-                          <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>
-                            Cantidad: {item.quantity}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => handleDeleteItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
+                <div className="space-y-4 mt-6">
+                  {sortedCategories.length > 0 ? (
+                    <Accordion type="multiple" value={activeAccordionItems} onValueChange={setActiveAccordionItems} className="w-full">
+                      {sortedCategories.map((categoryName) => {
+                        const group = groupedItems[categoryName];
+                        const sortedItems = [...group.items].sort((a, b) => Number(a.is_checked) - Number(b.is_checked));
+                        return (
+                          <AccordionItem value={categoryName} key={categoryName}>
+                            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                              {categoryName} <span className="text-sm font-normal text-gray-500 ml-2">({group.items.length})</span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="space-y-2 pt-2">
+                                {sortedItems.map(item => (
+                                  <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm group">
+                                    <div className="flex items-center gap-3">
+                                      <Checkbox id={`item-${item.id}`} checked={item.is_checked} onCheckedChange={() => handleToggleItemChecked(item.id, item.is_checked)} />
+                                      <label htmlFor={`item-${item.id}`} className={cn("font-medium cursor-pointer", item.is_checked && "line-through text-gray-500")}>
+                                        {item.product.name}
+                                      </label>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      {item.price_per_unit != null ? (<span className="text-sm font-semibold text-gray-800">${item.price_per_unit.toFixed(2)}</span>) : null}
+                                      <span className="text-sm text-gray-500 cursor-pointer hover:text-blue-600" onClick={() => handleEditItemClick(item)}>Cantidad: {item.quantity}</span>
+                                      <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteItem(item.id)}>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )
+                      })}
+                    </Accordion>
                   ) : (
-                    <EmptyState
-                      icon={ShoppingCart}
-                      title="Tu lista está vacía"
-                      description="Usa el formulario de arriba para añadir tu primer artículo y empezar a comprar."
-                      className="mt-6"
-                    />
+                    <EmptyState icon={ShoppingCart} title="Tu lista está vacía" description="Usa el formulario de arriba para añadir tu primer artículo y empezar a comprar." className="mt-6" />
                   )}
                 </div>
               </CardContent>

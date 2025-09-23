@@ -1,4 +1,0 @@
-Running seed command `node --loader ts-node/esm ./prisma/seed.ts` ...
-undefined
-C:\d\repos\proyecto-primus\packages\database:
- ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "prisma" not found
