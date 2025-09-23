@@ -8,7 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateListItemDto } from './dto/create-list-item.dto';
 import { UpdateListItemDto } from './dto/update-list-item.dto';
 import { /*...,*/ HttpCode } from '@nestjs/common';
-import { RequestWithUser } from '../auth/interfaces/request-with-user.interface'; // <-- Import your new interface
+import { RequestWithUser } from '../auth/interfaces/request-with-user.interface';
 
 @UseGuards(AuthGuard('jwt')) // <-- Protege todas las rutas de este controlador
 @Controller('shopping-lists')

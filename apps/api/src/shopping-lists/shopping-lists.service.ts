@@ -27,31 +27,46 @@ export class ShoppingListsService {
 
   async findOne(id: number, userId: string) {
     const list = await this.prisma.shoppingList.findUnique({
-      where: { id },
-      include: {
-        items: {
-          include: {
-            product: {
-              include: {
-                category: true,
-              },
-            },              
-          },
-          orderBy: {
-            id: 'asc'
-          }
+        where: { id },
+        include: {
+            items: {
+                include: {
+                    product: {
+                        include: {
+                            category: {
+                                include: {
+                                    user_preferences: {
+                                        where: { user_id: userId },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-      },
     });
 
     if (!list) {
-      throw new NotFoundException(`Shopping list with ID ${id} not found`);
+        throw new NotFoundException(`Shopping list with ID ${id} not found`);
     }
     if (list.user_id !== userId) {
-      throw new ForbiddenException('You do not have permission to access this list');
+        throw new ForbiddenException('You do not have permission to access this list');
     }
+
+    // Ordenamos los artículos aquí en el backend basándonos en la preferencia del usuario
+    list.items.sort((a, b) => {
+        const orderA = a.product.category?.user_preferences[0]?.order ?? a.product.category?.display_order ?? 999;
+        const orderB = b.product.category?.user_preferences[0]?.order ?? b.product.category?.display_order ?? 999;
+
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+        return a.id - b.id; // Orden estable para artículos en la misma categoría
+    });
+
     return list;
-  }
+}
 
   async update(id: number, updateDto: UpdateShoppingListDto, userId: string) {
     // Primero, usamos findOne para asegurar que la lista exista y pertenezca al usuario.
